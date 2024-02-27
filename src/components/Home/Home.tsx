@@ -48,7 +48,7 @@ const MainText = styled('div')({
 
 // create our Home component. even though its a function we capitalize it because its a component
 export const Home = (props: Props) => {
-    
+    const myAuth = localStorage.getItem('auth')
     // every component needs a return html & can only have 1 parent div
     return (
         <Root>
@@ -56,7 +56,7 @@ export const Home = (props: Props) => {
             <Main>
                 <MainText>
                     <Typography variant='h3'>{props.title}</Typography>
-                    <Button sx={{ marginTop: '10px'}} variant='contained' component={Link} to={'/shop'}>Enter if you dare.....👻</Button>
+                    <Button sx={{ marginTop: '10px'}} variant='contained' component={Link} to={ myAuth === 'true' ? '/shop' : '/auth' }>Enter if you dare.....👻</Button>
                 </MainText>
             </Main>
         </Root>

@@ -12,7 +12,6 @@ import {
     Stack, //flexbox
     Typography,
     Divider, 
-    CssBaseline,
     Box, //basic div
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom'; 
@@ -20,6 +19,8 @@ import AdbIcon from '@mui/icons-material/Adb';
 import BakeryDiningIcon from '@mui/icons-material/BakeryDining';
 import BathtubIcon from '@mui/icons-material/Bathtub';
 import CoffeeIcon from '@mui/icons-material/Coffee';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import { signOut, getAuth } from 'firebase/auth';
 
 
 // internal imports
@@ -87,6 +88,8 @@ export const NavBar = () => {
     // setup all our hooks
     const [ open, setOpen ] = useState(false) //setting initial state to false
     const navigate = useNavigate(); 
+    const auth = getAuth(); 
+    const myAuth = localStorage.getItem('auth'); // either going to be true or false
     
     
     // 2 function to help setup our hook
@@ -100,6 +103,9 @@ export const NavBar = () => {
     
     // list of nav link dictionaries ( each navlink will have 3 parts (text, icon, linking to))
     
+    // terinary is 1 liner if/else if/else 
+    // (true condition) ? then do this : true conditional again ? do this instead : else do this 
+    
     const navLinks = [
         {
             text: 'Home',
@@ -107,16 +113,33 @@ export const NavBar = () => {
             onClick: () => navigate('/')
         },
         {
-            text: 'Shop',
-            icon: <CoffeeIcon />,
-            onClick: () => navigate('/shop')
+            text: myAuth === 'true' ? 'Shop' : 'Sign In',
+            icon: myAuth === 'true' ? <CoffeeIcon /> : <AssignmentIndIcon />,
+            onClick: () => navigate( myAuth === 'true' ? '/shop' : '/auth')
         },
         {
-            text: 'Cart',
-            icon: <BakeryDiningIcon />,
-            onClick: () => navigate('/cart')
+            text: myAuth === 'true' ? 'Cart' : '',
+            icon: myAuth === 'true' ? <BakeryDiningIcon /> : '',
+            onClick: myAuth === 'true' ? () => navigate('/cart') : () => {}
         }
     ]
+    
+    // button text
+    let buttonText: string
+    myAuth === 'true' ? buttonText = 'Sign Out' : buttonText = 'Sign In'
+    
+    // button functionality
+    const signInButton = async () => {
+        if (myAuth === 'false') {
+            navigate('/auth')
+        } else {
+            await signOut(auth)
+            localStorage.setItem('auth', 'false') // nobody is logged in anymore 
+            localStorage.setItem('user', "")
+            localStorage.setItem('uuid', "")
+            navigate('/')
+        }
+    }
     
     return (
         <Box>
@@ -138,15 +161,16 @@ export const NavBar = () => {
                     sx = { navStyles.signInStack }
                >
                     <Typography variant='body2' sx={{ color: 'inherit' }}>
-                        Cool User
+                        { localStorage.getItem('user') }
                     </Typography>
                     <Button
                         variant='contained'
                         color='info'
                         size='large'
                         sx= {{ marginLeft: '20px'}}
+                        onClick = { signInButton }
                     >
-                        Sign In
+                        { buttonText }
                     </Button>
                </Stack>
             </AppBar>
