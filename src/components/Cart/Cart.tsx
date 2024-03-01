@@ -10,9 +10,6 @@ import {
     Grid,
     Box,
     Button,
-    Dialog,
-    DialogContent,
-    DialogContentText,
     Stack,
     Typography,
     Snackbar,
@@ -29,8 +26,12 @@ import { ShopProps } from '../../customHooks';
 import { shopStyles } from '../Shop';
 import { serverCalls } from '../../api'; 
 import { MessageType } from '../Auth'; 
+import { Order } from '../Order';
 
 
+export interface CreateOrderProps {
+    order: ShopProps[]
+}
 
 export const Cart = () => {
     //setup our hooks
@@ -122,15 +123,48 @@ export const Cart = () => {
             setOpen(true)
         })
     }
+    
+    
+    // Checkout & create an order!
+    const checkout = async () => {
+        
+        const data: CreateOrderProps = {
+            'order': currentCart as ShopProps[]
+        }
+        
+        console.log('we in the checkout zone!')
+        
+        const response = await serverCalls.createOrder(data)
+        
+        if (response.status === 200){
+            remove(cartRef)
+            .then(()=>{
+                setMessage('Successfully checked out')
+                setMessageType('success')
+                setOpen(true)
+            })
+            .then( () => setTimeout(()=> window.location.reload(), 2000))
+            .catch((error) => {
+                setMessage(error.message)
+                setMessageType('error')
+                setOpen(true)
+            })
+        } else {
+            setMessage('Error with Checkout')
+            setMessageType('error')
+            setOpen(true)
+        }
+    }
+    
     return (
         <Box sx={shopStyles.main}>
             <NavBar />
-            <Stack direction='column' sx={shopStyles.main}>
+            <Stack direction='column' sx={shopStyles.main} alignItems ='center'>
                 <Stack
                     direction='row'
                     alignItems='center'
-                    justifyContent='space-between'
-                    sx={{ marginTop: '100px', marginLeft: '200px', width: '400px'}}
+                    justifyContent='start'
+                    sx={{ marginTop: '100px', width: '100%', marginLeft: '400px'}}
                 >
                     <Typography variant='h4' sx={{marginRight: '20px'}}>
                         Your Cart
@@ -138,7 +172,7 @@ export const Cart = () => {
                     <Button
                         variant='contained'
                         color='primary'
-                        onClick={()=> {}}
+                        onClick={ checkout }
                         sx={{ width: '150px' }}
                     >
                         Checkout <LunchDiningIcon />
@@ -216,7 +250,12 @@ export const Cart = () => {
                         </Grid>
                     ))}
                 </Grid>
-                
+                <Stack direction='column' sx={{ width: '75%', marginTop: '100px'}}> 
+                    <Typography variant='h4' sx={{marginRight: '20px'}}>
+                        Your Orders
+                    </Typography>
+                    <Order />
+                </Stack>
             </Stack>
             <Snackbar 
                 open={open}

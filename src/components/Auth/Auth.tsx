@@ -1,6 +1,6 @@
 import * as _React from 'react';
 import { useState } from 'react'; 
-import { useCreateUserWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth'; 
+import { useSignInWithGoogle } from 'react-firebase-hooks/auth'; 
 import {
     onAuthStateChanged,
     getAuth,
@@ -15,7 +15,6 @@ import {
     Typography,
     Stack,
     Snackbar, //displaying alerts whether someone successfully signs in or not
-    Divider,
     CircularProgress, // Loading symbol
     Dialog, 
     DialogContent,

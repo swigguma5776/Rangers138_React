@@ -25,6 +25,11 @@ interface GetShopDataProps {
     getData: () => void
 }
 
+interface GetOrderDataProps {
+    orderData: ShopProps[]
+    getData: () => void
+}
+
 
 // create our custom hook to make our API call to get our Shop products. And only making this call once. 
 export const useGetShop = (): GetShopDataProps => {
@@ -45,4 +50,21 @@ export const useGetShop = (): GetShopDataProps => {
     useEffect( () => { handleDataFetch() }, []) // [] inside is our depency list aka what are we listening for
     
     return { shopData, getData: handleDataFetch }
+}
+
+
+// create custom hook to make API calls to get our Orders. 
+export const useGetOrder = (): GetOrderDataProps => {
+    const [ orderData, setOrderData ] = useState<ShopProps[]>([])
+    
+    
+    const handleDataFetch = async () => {
+        const result = await serverCalls.getOrder()
+        
+        setOrderData(result)
+    }
+    
+    useEffect( () => { handleDataFetch() }, []) // [] inside is our depency list aka what are we listening for
+    
+    return { orderData, getData: handleDataFetch }
 }
